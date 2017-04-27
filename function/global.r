@@ -21,7 +21,7 @@ library(DT)
 
 #symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 
-bcp.investor <- function(assetsName, lag, sensibility){
+bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
   #asset<-getSymbols(assetsName,auto.assign = FALSE)
   #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
@@ -34,8 +34,9 @@ bcp.investor <- function(assetsName, lag, sensibility){
   #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
   
   #wkreturn <- DataSet$assetsName
-  #assetsName<-'ALTEN'
+  #assetsName<-'ACCOR'
   wkreturn <- DataSet[,assetsName] * 0.01
+  wkreturn <- wkreturn[,assetsName]
  # wkreturn <-data.frame(return = wkreturn)
 #  row.names(wkreturn) <- DataSet$Date
   
@@ -43,6 +44,7 @@ bcp.investor <- function(assetsName, lag, sensibility){
   
   # Noter les dates
   wkdate <- DataSet[,'Date']
+  wkdate <- wkdate$Date
   # wkreturn <-data.frame(return = wkreturn)
   #  row.names(wkreturn) <- DataSet$Date
   
@@ -67,7 +69,7 @@ bcp.investor <- function(assetsName, lag, sensibility){
   )
 
   rownames(df)<-c(index(wkreturn),"01")
-  df$return <- c(as.vector(wkreturn),NA)
+  df$return <- c(wkreturn,NA)
   
   n <- length(df$prob)
   
@@ -100,6 +102,7 @@ bcp.investor <- function(assetsName, lag, sensibility){
     
     wealth[i] <- (1+df$return[i])*wealth[i-1]
     #print(wealth2[i-1] + (df$return[i] -  df$return[i]*(1 - df$strat[i])  )*wealth2[i-1])
+    
     wealth2[i] <- wealth2[i-1] + (df$return[i] -  df$return[i]*(1-df$strat[i])  )*wealth2[i-1]
     
   }
@@ -109,7 +112,7 @@ bcp.investor <- function(assetsName, lag, sensibility){
  
   df$date <- c(as.vector(wkdate),NA)
   
-  View(df)
+  #View(df)
   
   return(df)
   

@@ -4,7 +4,7 @@
 
 
 backtest.plot<-function(df.bcp){
-  
+  data = data.frame(date=index(df.bcp), val=df.bcp[,11,drop=T])
   p<-plot_ly(
     
     data = data,
@@ -18,7 +18,7 @@ backtest.plot<-function(df.bcp){
   )%>%
     add_trace(y = df.bcp[,12,drop=T], name = 'Bayesian Investor', mode = 'lines')
   
-  data = data.frame(date=index(x), val=df.bcp[,8,drop=T])
+  data = data.frame(date=index(df.bcp), val=df.bcp[,8,drop=T])
   q<-plot_ly(
     
     data = data,

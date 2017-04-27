@@ -1,52 +1,48 @@
 source("function/global.r")
-source("function/global.r")
+source("function/plot.r")
 #tout les plots ici
 
     # Same as above, but with fill=TRUE
 
 
 
+#Loading data
+DataSet <- read_excel("data/data.xlsx",
+col_types = c("date", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric", "numeric", "numeric",
+              "numeric"))
 
 
-    output$aggressivityBox <- renderValueBox({
-      x<-dataInput()
-      li <- agressivity.investmen(x)
-      coef <- li[[1]]
-      aggressivity.coef <- round(coef,2)
-      valueBox(
-        aggressivity.coef, "Aggressivity", icon = icon("signal", lib = "glyphicon"),
-        color = "orange" #, fill = TRUE
-      )
-    })
-    output$periodDurationBox <- renderValueBox({
-      x<-dataInput()
-      li <- agressivity.investmen(x)
-      duration <- li[[2]]
-      valueBox(
-        paste0(duration,' week(s)'), "Selling/Buying perdiod", icon = icon("time", lib = "glyphicon"),
-        color = "yellow" #, fill = TRUE
-      )
-    })
-    output$perfermanceBox <- renderValueBox({
-      x<-dataInput()
-      li <- agressivity.investmen(x)
-      duration <- li[[3]]
-      valueBox(
-        paste0(duration,'%'), "Performance period", icon = icon("time", lib = "glyphicon"),
-        color = "yellow" #, fill = TRUE
-      )
-    })
-    
-    output$DateBox <- renderValueBox({
-      x<-dataInput()
-      li <- agressivity.investmen(x)
-      duration <- li[[4]]
-      valueBox(
-        paste0('Since ',duration), paste0(" Selling/Buying perdiod"), icon = icon("time", lib = "glyphicon"),
-        color = "yellow" #, fill = TRUE
-      )
-    })
-    
+#Get assets names
+symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
+
+
+df <- bcp.investor(DataSet, 'ACCOR',20,0.01)
+
+backtest.plot(df)
+ratio.plot(df)
+
+li <- agressivity.investmen(df)
+coef <- li[[1]]
+duration <- li[[3]]
+date <- li[[4]]
+
+aggressivity.coef <- round(coef,2)
+print(aggressivity.coef)
+print(duration)
+print(date)
+
 
 
 
