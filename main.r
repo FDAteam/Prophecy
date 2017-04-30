@@ -26,7 +26,7 @@ col_types = c("date", "numeric", "numeric",
 
 #Get assets names
 symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
-
+message("Test 1")
 
 df <- bcp.investor(DataSet, 'ACCOR',20,0.01)
 
