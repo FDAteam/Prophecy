@@ -27,8 +27,8 @@ col_types = c("date", "numeric", "numeric",
 #Get assets names
 symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 message("Commit branch")
-
 message("Je suis sur la branche Niak12")
+
 df <- bcp.investor(DataSet, 'ACCOR',20,0.01)
 
 backtest.plot(df)
