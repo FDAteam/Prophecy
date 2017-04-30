@@ -18,15 +18,19 @@ library(DT)
 #DataSet <-read.delim('C:\\Users\\ibrahim\\Documents\\Ibrahim\\Mes docs\\Bayesian\\ShinyDashboard18 02 17 - Copie\\ShinyDashboard\\CAC10Y.txt', header=TRUE) 
 
 
-
+message("test chgt branche1")
 #symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 
 bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
   #asset<-getSymbols(assetsName,auto.assign = FALSE)
   #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
+<<<<<<< HEAD
   message("New tests")s
   message("test 2")
+=======
+  message("test branche Niak2")
+>>>>>>> refs/remotes/origin/Branch-Niak12
   
   #asset<-getSymbols(assetsName,auto.assign = FALSE)
   
