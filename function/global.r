@@ -25,12 +25,10 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
   #asset<-getSymbols(assetsName,auto.assign = FALSE)
   #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
-<<<<<<< HEAD
-  message("New tests")s
+  
+  message("New tests")
   message("test 2")
-=======
   message("test branche Niak2")
->>>>>>> refs/remotes/origin/Branch-Niak12
   
   #asset<-getSymbols(assetsName,auto.assign = FALSE)
   
