@@ -25,7 +25,7 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
   #asset<-getSymbols(assetsName,auto.assign = FALSE)
   #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
-  
+  message("New tests")
   
   #asset<-getSymbols(assetsName,auto.assign = FALSE)
   
