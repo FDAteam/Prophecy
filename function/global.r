@@ -18,7 +18,7 @@ library(DT)
 #DataSet <-read.delim('C:\\Users\\ibrahim\\Documents\\Ibrahim\\Mes docs\\Bayesian\\ShinyDashboard18 02 17 - Copie\\ShinyDashboard\\CAC10Y.txt', header=TRUE) 
 
 
-
+message("test chgt branche")
 #symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 
 bcp.investor <- function(DataSet,assetsName, lag, sensibility){
