@@ -1,3 +1,4 @@
+library(readxl)
 source("function/global.r")
 source("function/plot.r")
 #tout les plots ici
@@ -7,32 +8,19 @@ source("function/plot.r")
 
 
 #Loading data
-DataSet <- read_excel("data/data.xlsx",
-col_types = c("date", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric"))
+DataSet <- read_excel("data/data.xlsx")
 
 
 #Get assets names
 symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
-message("Commit branch")
-message("Je suis sur la branche Niak12")
 
+#Asset dataframe
 df <- bcp.investor(DataSet, 'ACCOR',20,0.01)
 
+#Plot backtest
 backtest.plot(df)
 ratio.plot(df)
+
 
 li <- agressivity.investmen(df)
 coef <- li[[1]]
@@ -44,6 +32,12 @@ print(aggressivity.coef)
 print(duration)
 print(date)
 
+
+#Ploting
+#View(df)
+#df.x <- cbind(df, ifelse(df$return>0, 1, 0))
+#plot(df.x$strat,
+#     df.x$sharp - df.x$thresld)
 
 
 

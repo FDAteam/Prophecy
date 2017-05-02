@@ -15,43 +15,20 @@ library(DT)
 
 
 
-#DataSet <-read.delim('C:\\Users\\ibrahim\\Documents\\Ibrahim\\Mes docs\\Bayesian\\ShinyDashboard18 02 17 - Copie\\ShinyDashboard\\CAC10Y.txt', header=TRUE) 
 
 
-message("test chgt branche1")
-#symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 
 bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
-  #asset<-getSymbols(assetsName,auto.assign = FALSE)
-  #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
   
-  message("New tests")
-  message("test 2")
-  message("test branche Niak2")
-  
-  #asset<-getSymbols(assetsName,auto.assign = FALSE)
-  
-  #wkreturn<-read.delim('C:\\Users\\ibrahim\\Documents\\Ibrahim\\Mes docs\\Bayesian\\ShinyDashboard18 02 17 - Copie\\ShinyDashboard\\STXX50+SBF120DataReuters10Y 31 01 2017_ Clean.txt', header=TRUE) 
-  
-  #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
-  
-  #wkreturn <- DataSet$assetsName
-  #assetsName<-'ACCOR'
   wkreturn <- DataSet[,assetsName] * 0.01
   wkreturn <- wkreturn[,assetsName]
- # wkreturn <-data.frame(return = wkreturn)
-#  row.names(wkreturn) <- DataSet$Date
-  
+
   ts.asset <-timeSeries(wkreturn)
   
   # Noter les dates
   wkdate <- DataSet[,'Date']
-  wkdate <- wkdate$Date
-  # wkreturn <-data.frame(return = wkreturn)
-  #  row.names(wkreturn) <- DataSet$Date
-  
-  #date.asset <-timeSeries(wkdate)
+
   
   ###################
   bcp.asset <-bcp(ts.asset, burnin = 5000, mcmc = 5000) #Ajout MC number , mcmc= 5000
@@ -163,9 +140,9 @@ agressivity.investmen <- function(df.bcp){
     perf <- (df.bcp$wealth[n-1] - df.bcp$wealth[index+1])/df.bcp$wealth[index+1]
     #print(df.bcp$wealth[n])
     #print(n)
-    print(df.bcp$wealth[(index+1):n])
-    print(df.bcp$return[(index+1):n])
-    print('')
+    #print(df.bcp$wealth[(index+1):n])
+    #print(df.bcp$return[(index+1):n])
+    #print('')
     
     #Relever la date de changement de position
     
