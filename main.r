@@ -22,7 +22,7 @@ backtest.plot(df)
 ratio.plot(df)
 
 
-li <- agressivity.investmen(df)
+li <- agressivity.investment(df)
 coef <- li[[1]]
 duration <- li[[3]]
 date <- li[[4]]

@@ -28,6 +28,7 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
   # Noter les dates
   wkdate <- DataSet[,'Date']
+  wkdate <- as.character(wkdate$Date)
 
   
   ###################
@@ -111,7 +112,7 @@ error.investment <- function(df.bcp){
 
 
 
-agressivity.investmen <- function(df.bcp){
+agressivity.investment <- function(df.bcp){
   n<-length(df.bcp$strat)
   indicator <- TRUE
   i <- 0
@@ -150,9 +151,9 @@ agressivity.investmen <- function(df.bcp){
     perf <- (df.bcp$wealth[n-1] - df.bcp$wealth[index+1])/df.bcp$wealth[index+1]
     #print(df.bcp$wealth[n])
     #print(n)
-    print(df.bcp$wealth[(index+1):n])
-    print(df.bcp$return[(index+1):n])
-    print('')
+    #print(df.bcp$wealth[(index+1):n])
+    #print(df.bcp$return[(index+1):n])
+    #print('')
     
     return(list(aggressivity.coef, n - index,round(perf,4)*100,aggressivity.dur))
   }
