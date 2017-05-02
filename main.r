@@ -1,4 +1,6 @@
 library(readxl)
+library(GGally)
+library(ggplot2)
 source("function/global.r")
 source("function/plot.r")
 #tout les plots ici
@@ -34,14 +36,29 @@ print(duration)
 print(date)
 
 
+df2 <- cbind(df, "ind" = ifelse(df$return>0, "Buy", "Sell"))
+
 
 
 #Ploting
-plot(df[,-c(1,11,ncol(df))], col=ifelse(df$return>0, "red", "black"))
-View(df)
-#df.x <- cbind(df, ifelse(df$return>0, 1, 0))
-#plot(df.x$strat,
-#     df.x$sharp - df.x$thresld)
+plot(df[,-c(1,2,3,7,11,12,ncol(df))],
+     col=ifelse(df$return>0, "red", "black"),
+     pch = 19)
+
+
+
+
+# Overlaid histograms
+# Distribution of Buy Sell indicator over Bayesian Sharp ratio
+ggplot(df2, aes(x=sharp, fill=ind)) +
+  geom_histogram(binwidth=20, alpha=.4, position="identity")
+
+
+# Distribution of Buy Sell indicator over Bayesian Sharp ratio
+ggplot(df2, aes(x=thresld, fill=ind)) +
+  geom_histogram(binwidth=20, alpha=.4, position="identity")
+
+
 
 
 
