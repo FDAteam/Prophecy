@@ -22,6 +22,7 @@ backtest.plot(df)
 ratio.plot(df)
 
 
+#KPI calculation
 li <- agressivity.investment(df)
 coef <- li[[1]]
 duration <- li[[3]]
@@ -33,8 +34,11 @@ print(duration)
 print(date)
 
 
+
+
 #Ploting
-#View(df)
+plot(df[,-c(1,11,ncol(df))], col=ifelse(df$return>0, "red", "black"))
+View(df)
 #df.x <- cbind(df, ifelse(df$return>0, 1, 0))
 #plot(df.x$strat,
 #     df.x$sharp - df.x$thresld)
