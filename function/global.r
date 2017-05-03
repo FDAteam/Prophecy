@@ -103,6 +103,27 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
 
 
 
+df.format <- function(DataSet, lag){
+  
+  #lag 1
+  lag1 <- c(NA,NA,NA, DataSet[4:(nrow(DataSet))-1,'sharp'])
+  DataSet$lag1 <- lag1
+  
+  lag2 <- c(NA,NA,NA,NA, DataSet[5:(nrow(DataSet))-2,'sharp'])
+  DataSet$lag2 <- lag2
+  
+  
+  lag3 <- c(NA,NA,NA,NA,NA, DataSet[6:(nrow(DataSet))-3,'sharp'])
+  DataSet$lag3 <- lag3
+  
+  DataSet$agressivity1 <- (DataSet$sharp - DataSet$lag1)/DataSet$lag1
+  DataSet$agressivity2 <- (DataSet$sharp - DataSet$lag2)/DataSet$lag2
+  DataSet$agressivity3 <- (DataSet$sharp - DataSet$lag3)/DataSet$lag3
+  
+  return(DataSet)
+}
+
+
 
 error.investment <- function(df.bcp){
   n<-length(df.bcp$strat)
