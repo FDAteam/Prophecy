@@ -1,6 +1,3 @@
-library(readxl)
-library(GGally)
-library(ggplot2)
 source("function/global.r")
 source("function/plot.r")
 #tout les plots ici
@@ -44,7 +41,6 @@ df2 <- cbind(df, "ind" = ifelse(df$return>0, "Buy", "Sell"))
 plot(df[,-c(1,2,3,7,11,12,ncol(df))],
      col=ifelse(df$return>0, "red", "black"),
      pch = 19)
-
 
 
 

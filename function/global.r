@@ -10,8 +10,10 @@ library(quadprog)
 library(shiny)
 library(quantmod)
 library(shinydashboard)
-library(plotly)
 library(DT)
+library(readxl)
+library(GGally)
+library(ggplot2)
 
 
 
@@ -19,7 +21,6 @@ library(DT)
 
 
 bcp.investor <- function(DataSet,assetsName, lag, sensibility){
-  
   
   wkreturn <- DataSet[,assetsName] * 0.01
   wkreturn <- wkreturn[,assetsName]
