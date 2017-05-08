@@ -111,8 +111,8 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   df$wealth.strat <- wealth2
  
   df$date <- c(as.vector(wkdate),NA)
-  
-  #View(df)
+
+  View(df)
   
   return(df)
   
