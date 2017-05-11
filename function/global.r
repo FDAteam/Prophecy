@@ -171,11 +171,7 @@ agressivity.investment <- function(df.bcp){
     
     aggressivity.dur <- df.bcp$date[index]
     perf <- (df.bcp$wealth[n-1] - df.bcp$wealth[index+1])/df.bcp$wealth[index+1]
-    #print(df.bcp$wealth[n])
-    #print(n)
-    #print(df.bcp$wealth[(index+1):n])
-    #print(df.bcp$return[(index+1):n])
-    #print('')
+
     
     return(list(aggressivity.coef, n - index,round(perf,4)*100,aggressivity.dur))
   }
