@@ -22,7 +22,7 @@
 ###########################################################
 
 
-data <- read.table(file="C:/Users/ibrahim/Desktop/Quant Methods/Hub/Prophecy/data/Logit/dataLogit3.txt",sep="\t",dec=".",header =T) #cette parti marche mais pas
+data <- read.table(file="C:/Users/ibrahim/Desktop/Quant Methods/Hub/Prophecy/data/demoLog2.txt",sep="\t",dec=".",header =T) #cette parti marche mais pas
                                                                                                                               # mais pas en fichier excel
                                                                                                                       #car non numeric
 #data <- read_excel("data/demoLog.xlsx")
@@ -36,7 +36,7 @@ data <- read.table(file="C:/Users/ibrahim/Desktop/Quant Methods/Hub/Prophecy/dat
 class(data)
 summary(data)
 data
-modele <- glm(strat ~ mean+var+prob, data = data, family=binomial)
+modele <- glm(coeur ~ age+angine+taux, data = data, family=binomial)
 class(modele)
 print(modele)
 print(summary(modele))
