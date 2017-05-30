@@ -16,13 +16,47 @@ library(ggplot2)
 
 
 
+robust.check <- function(DataSet,assetsName, lag, sensibility,loop){
+  
+  dd1<-DataSet[(1:nrow(DataSet)-40),]
+  dd2<-DataSet[(1:nrow(DataSet)-30),]
+  dd3<-DataSet[(1:nrow(DataSet)-20),]
+  dd4<-DataSet[(1:nrow(DataSet)-10),]
+  dd5<-DataSet
+  
+  df1 <- strategy.stabilization(dd1,assetsName, lag, sensibility, loop)
+  df2 <- strategy.stabilization(dd2,assetsName, lag, sensibility, loop)
+  df3 <- strategy.stabilization(dd3,assetsName, lag, sensibility, loop)
+  df4 <- strategy.stabilization(dd4,assetsName, lag, sensibility, loop)
+  df5 <- strategy.stabilization(dd5,assetsName, lag, sensibility, loop)
+  
+  s1 <- as.vector(df1$StableStrat)
+  s2 <- as.vector(df2$StableStrat)
+  s3 <- as.vector(df3$StableStrat)
+  s4 <- as.vector(df4$StableStrat)
+  s5 <- as.vector(df5$StableStrat)
+  
+  maxlength <- length(s5)
+
+  s1 <- c(s1, rep(NA,maxlength - length(s1)))
+  s2 <- c(s2, rep(NA,maxlength - length(s2)))
+  s3 <- c(s3, rep(NA,maxlength - length(s3)))
+  s4 <- c(s4, rep(NA,maxlength - length(s4)))
+  s5 <- c(s5, rep(NA,maxlength - length(s5)))
+  
+  return(data.frame('a1' = s1, 'a2' = s2, 'a3' = s3, 'a4' = s4, 'a5' = s5))
+  
+  
+  
+}
+
 
 bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
   wkreturn <- DataSet[,assetsName] * 0.01
   wkreturn <- wkreturn[,assetsName]
 
-  ts.asset <-timeSeries(wkreturn)
+  ts.asset <- timeSeries(wkreturn)
   
   # Noter les dates
   wkdate <- DataSet[,'Date']
@@ -30,11 +64,11 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
 
   
   ###################
-  bcp.asset <-bcp(ts.asset, burnin = 5000, mcmc = 5000) #Ajout MC number , mcmc= 5000
+  bcp.asset <- bcp(ts.asset, burnin = 5000, mcmc = 5000) #Ajout MC number , mcmc= 5000
   
   #Proba decale de 1 (forecast)
   #prob = c(0, bcp.asset$posterior.prob[1:length(bcp.asset$posterior.prob)-1])
-  prob = c(NA,NA, bcp.asset$posterior.prob[1:length(bcp.asset$posterior.prob)-1])
+  prob = c(NA,NA, bcp.asset$posterior.prob[1:length(bcp.asset$posterior.prob) - 1])
   
   df <- data.frame( 
                     "posterior.mean.o" = c(bcp.asset$posterior.mean,NA),
@@ -47,20 +81,20 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
                     "prob" = prob
   )
 
-  rownames(df)<-c(index(wkreturn),"01")
+  rownames(df) <- c(index(wkreturn),"01")
   df$return <- c(wkreturn,NA)
   
   n <- length(df$prob)
   
   #Sharp decale de 1 (forecast)
-  sharp.temp <- ((df$posterior.mean)/(sqrt(df$posterior.var)))*(1/(df$prob+0.001))
+  sharp.temp <- ((df$posterior.mean)/(sqrt(df$posterior.var)))*(1/(df$prob + 0.001))
   df$sharp <- sharp.temp
   thresld <- rep(99999,n)
   
   
   
-  for(i in 1:n){
-    if(i<20){
+  for (i in 1:n){
+    if (i < 20){
       thresld[i] <- quantile( df$sharp[1:i], c(.1, .2, .3, .4, .5, .6, .7, .8, .9), na.rm = TRUE)[3]
     }
     else{
@@ -97,6 +131,24 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
   
 }
+
+strategy.stabilization <- function(DataSet,assetsName, lag, sensibility, loop){
+  
+  strat <- rep(0,nrow(df))
+  for(i in seq(1,loop)){
+    message(i)
+    df_temp = bcp.investor(DataSet,assetsName, lag, sensibility)
+    strat <- strat + as.vector(df_temp$strat)
+  }
+  
+  strat <- strat/loop
+  
+  df_temp$StableStrat <- strat
+  message('End')
+  return(df_temp)
+}
+
+
 
 
 

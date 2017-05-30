@@ -14,8 +14,16 @@ DataSet <- read_excel("data/data.xlsx")
 symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 
 #Asset dataframe
-df <- bcp.investor(DataSet, 'ACCOR',20,0.01)
+df <- bcp.investor(DataSet[1:30,], 'ACCOR',20,0.01)
+
+#Nouveau - va stabiliser la stratégie (colonne StableStrat - derniere colonne)
+df <- strategy.stabilization(DataSet[1:30,], 'ACCOR',10,0.01, 10)
+
 df <-df.format(df,20)
+
+tt<-robust.check(DataSet, 'ACCOR',20,0.01, 20)
+tt$err<-apply(tt, 1, sd)
+
 
 View(df)
 #Plot backtest
