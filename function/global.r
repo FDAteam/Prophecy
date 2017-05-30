@@ -16,13 +16,14 @@ library(ggplot2)
 
 
 
-robust.check <- function(DataSet,assetsName, lag, sensibility,loop){
-  
-  dd1<-DataSet[(1:nrow(DataSet)-40),]
-  dd2<-DataSet[(1:nrow(DataSet)-30),]
-  dd3<-DataSet[(1:nrow(DataSet)-20),]
-  dd4<-DataSet[(1:nrow(DataSet)-10),]
-  dd5<-DataSet
+robust.check <- function(datas,assetsName, lag, sensibility,loop){
+  #message(nrow(datas))
+  dd1<-datas[1:(nrow(datas)-40),]
+  #message('OK')
+  dd2<-datas[1:(nrow(datas)-30),]
+  dd3<-datas[1:(nrow(datas)-20),]
+  dd4<-datas[1:(nrow(datas)-10),]
+  dd5<-datas
   
   df1 <- strategy.stabilization(dd1,assetsName, lag, sensibility, loop)
   df2 <- strategy.stabilization(dd2,assetsName, lag, sensibility, loop)
@@ -134,7 +135,7 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
 
 strategy.stabilization <- function(DataSet,assetsName, lag, sensibility, loop){
   
-  strat <- rep(0,nrow(df))
+  strat <- rep(0,nrow(DataSet))
   for(i in seq(1,loop)){
     message(i)
     df_temp = bcp.investor(DataSet,assetsName, lag, sensibility)
