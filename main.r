@@ -1,3 +1,4 @@
+library(readxl)
 source("function/global.r")
 source("function/plot.r")
 #tout les plots ici
@@ -14,7 +15,9 @@ DataSet <- read_excel("data/data.xlsx")
 symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 
 #Asset dataframe
-df <- bcp.investor(DataSet, 'ACCOR',20,0.01)
+
+df <- bcp.investor(DataSet, 'AXA',20,0.01)
+
 
 #Nouveau - va stabiliser la stratégie (colonne StableStrat - derniere colonne)
 df <- strategy.stabilization(DataSet, 'ACCOR',10,0.01, 10)
@@ -42,14 +45,18 @@ View(df)
 backtest.plot(df)
 ratio.plot(df)
 
-
 #KPI calculation
-li <- agressivity.investment(df)
+
+bs<- investment.approver(df)
+li <- agressivity.investmen(df)
+
 coef <- li[[1]]
 duration <- li[[3]]
 date <- li[[4]]
 
 aggressivity.coef <- round(coef,2)
+
+print(bs)
 print(aggressivity.coef)
 print(duration)
 print(date)

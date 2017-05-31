@@ -67,8 +67,9 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   wkdate <- as.character(wkdate$Date)
 
   
-  ###################
-  bcp.asset <- bcp(ts.asset, burnin = 5000, mcmc = 5000) #Ajout MC number , mcmc= 5000
+
+  bcp.asset <-bcp(ts.asset, burnin = 10000, mcmc = 10000) #Ajout MC number , mcmc= 5000
+
   
   #Proba decale de 1 (forecast)
   #prob = c(0, bcp.asset$posterior.prob[1:length(bcp.asset$posterior.prob)-1])
@@ -128,9 +129,9 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   df$wealth.strat <- wealth2
  
   df$date <- c(as.vector(wkdate),NA)
-  
-  #View(df)
-  
+
+  View(df)
+  # write.xlsx2(df, 'data\\Mad1.xlsx', sheetName="Feuil1",col.names=TRUE, row.names=TRUE, append=FALSE)
   return(df)
   
   
