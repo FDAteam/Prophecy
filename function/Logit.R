@@ -22,7 +22,7 @@
 ###########################################################
 
 
-data <- read.table(file="C:/Users/ibrahim/Desktop/Quant Methods/Hub/Prophecy/data/Logit/dataLogit3.txt",sep="\t",dec=".",header =T) #cette parti marche mais pas
+data <- read.table(file="/data/Logit/dataLogit3.txt",sep="\t",dec=".",header =T) #cette parti marche mais pas
                                                                                                                               # mais pas en fichier excel
                                                                                                                       #car non numeric
 #data <- read_excel("data/demoLog.xlsx")

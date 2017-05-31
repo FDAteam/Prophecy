@@ -130,7 +130,7 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
  
   df$date <- c(as.vector(wkdate),NA)
 
-  View(df)
+  #View(df)
   # write.xlsx2(df, 'data\\Mad1.xlsx', sheetName="Feuil1",col.names=TRUE, row.names=TRUE, append=FALSE)
   return(df)
   
