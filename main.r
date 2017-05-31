@@ -14,18 +14,30 @@ DataSet <- read_excel("data/data.xlsx")
 symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 
 #Asset dataframe
-df <- bcp.investor(DataSet[1:30,], 'ACCOR',20,0.01)
+df <- bcp.investor(DataSet, 'ACCOR',20,0.01)
 
 #Nouveau - va stabiliser la stratégie (colonne StableStrat - derniere colonne)
-df <- strategy.stabilization(DataSet[1:30,], 'ACCOR',10,0.01, 10)
+df <- strategy.stabilization(DataSet, 'ACCOR',10,0.01, 10)
 
-df <-df.format(df,20)
+#Formatage pour logit si necessaire
+df <- df.format(df,20)
 
-tt<-robust.check(DataSet, 'ACCOR',20,0.01, 20)
+#test de robustesse
+tt <- robust.check(DataSet, 'ACCOR',20,0.01, 200)
+
+
+#Calcul de l'erreur (standard deviation)
+#On constate que -> Pour les points ou la stabilisation n'est pas bonne
+#(i.e moyenne proche de 0.5) la SD atteint sont max (parabole inverse) - (ajouter une fonction de previsions de l'erreurs?)
+#On constate qu'il y a une dizaine de points ou l'erreur est max (le backtest est très influencé par la quantité de data)
+#On constate que, plus loop est grand (stabilisation), plus l'erreur se resorbe, mais les points aberrants sont tjs la
 tt$err<-apply(tt, 1, sd)
+plot(tt)
 
 
 View(df)
+
+
 #Plot backtest
 backtest.plot(df)
 ratio.plot(df)

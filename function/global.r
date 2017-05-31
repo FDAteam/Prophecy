@@ -15,7 +15,10 @@ library(ggplot2)
 
 
 
-
+#Fonction qui va tester la robustesse du modele
+#On verifie si le backtesting est affecté par les données futures
+#On compare 5 backtesting, avec une quantité de donnée differentes
+#On se base sur des backtests deja stabilisés
 robust.check <- function(datas,assetsName, lag, sensibility,loop){
   #message(nrow(datas))
   dd1<-datas[1:(nrow(datas)-40),]
@@ -51,7 +54,7 @@ robust.check <- function(datas,assetsName, lag, sensibility,loop){
   
 }
 
-
+#Fonction de base, genere le backtest et la strategie d'investisement a t+1
 bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
   wkreturn <- DataSet[,assetsName] * 0.01
@@ -133,6 +136,10 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
 }
 
+
+#Fonction qui lance plusieurs fois bcp.investor
+#et fais la moyenne des decisions d'investissement
+#pour une bonne stabilisation pensée à mettre loop > 100
 strategy.stabilization <- function(DataSet,assetsName, lag, sensibility, loop){
   
   strat <- rep(0,nrow(DataSet))
