@@ -8,36 +8,48 @@ source("function/plot.r")
 
 
 #Loading data
-DataSet <- read_excel("data/data.xlsx",
-col_types = c("date", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric", "numeric", "numeric",
-              "numeric"))
+DataSet <- read_excel("data/data.xlsx")
 
 
 #Get assets names
 symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
-message("Commit branch")
-message("Je suis sur la branche Niak12")
+
+#Asset dataframe
 
 df <- bcp.investor(DataSet, 'AXA',20,0.01)
 
+
+#Nouveau - va stabiliser la stratégie (colonne StableStrat - derniere colonne)
+df <- strategy.stabilization(DataSet, 'ACCOR',10,0.01, 10)
+
+#Formatage pour logit si necessaire
+df <- df.format(df,20)
+
+#test de robustesse
+tt <- robust.check(DataSet, 'ACCOR',20,0.01, 200)
+
+
+#Calcul de l'erreur (standard deviation)
+#On constate que -> Pour les points ou la stabilisation n'est pas bonne
+#(i.e moyenne proche de 0.5) la SD atteint sont max (parabole inverse) - (ajouter une fonction de previsions de l'erreurs?)
+#On constate qu'il y a une dizaine de points ou l'erreur est max (le backtest est très influencé par la quantité de data)
+#On constate que, plus loop est grand (stabilisation), plus l'erreur se resorbe, mais les points aberrants sont tjs la
+tt$err<-apply(tt, 1, sd)
+plot(tt)
+
+
+View(df)
+
+
+#Plot backtest
 backtest.plot(df)
 ratio.plot(df)
 
+#KPI calculation
 
 bs<- investment.approver(df)
 li <- agressivity.investmen(df)
+
 coef <- li[[1]]
 duration <- li[[3]]
 date <- li[[4]]
@@ -48,6 +60,34 @@ print(bs)
 print(aggressivity.coef)
 print(duration)
 print(date)
+
+
+df2 <- cbind(df, "ind" = ifelse(df$return>0, "Buy", "Sell"))
+
+
+
+#Ploting
+plot(df[,c(4,5,6,7,8,9,10,14,15,16,17,18,19)],
+     col=ifelse(df$return>0, "red", "black"),
+     pch = 19)
+
+
+
+# Overlaid histograms
+# Distribution of Buy Sell indicator over Bayesian Sharp ratio
+ggplot(df2, aes(x=sharp, fill=ind)) +
+  geom_histogram(binwidth=20, alpha=.4, position="identity")
+
+
+# Distribution of Buy Sell indicator over Threshold
+ggplot(df2, aes(x=thresld, fill=ind)) +
+  geom_histogram(binwidth=20, alpha=.4, position="identity")
+
+
+# Distribution of Buy Sell indicator over aggressivity ratio
+ggplot(df2, aes(x=agressivity3, fill=ind)) +
+  geom_histogram(binwidth=1, alpha=.4, position="identity")
+
 
 
 

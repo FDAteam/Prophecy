@@ -1,61 +1,79 @@
-library(shiny)
+
 library(quantmod)
-library(shinydashboard)
 library(plotly)
 library(DT)
 library(timeSeries)
 library(bcp)
 library(FRAPO)
 library(quadprog)
-library(shiny)
 library(quantmod)
-library(shinydashboard)
-library(plotly)
 library(DT)
+library(readxl)
+library(GGally)
+library(ggplot2)
 
 
 
-#DataSet <-read.delim('C:\\Users\\ibrahim\\Documents\\Ibrahim\\Mes docs\\Bayesian\\ShinyDashboard18 02 17 - Copie\\ShinyDashboard\\CAC10Y.txt', header=TRUE) 
 
+#Fonction qui va tester la robustesse du modele
+#On verifie si le backtesting est affecté par les données futures
+#On compare 5 backtesting, avec une quantité de donnée differentes
+#On se base sur des backtests deja stabilisés
+robust.check <- function(datas,assetsName, lag, sensibility,loop){
+  #message(nrow(datas))
+  dd1<-datas[1:(nrow(datas)-40),]
+  #message('OK')
+  dd2<-datas[1:(nrow(datas)-30),]
+  dd3<-datas[1:(nrow(datas)-20),]
+  dd4<-datas[1:(nrow(datas)-10),]
+  dd5<-datas
+  
+  df1 <- strategy.stabilization(dd1,assetsName, lag, sensibility, loop)
+  df2 <- strategy.stabilization(dd2,assetsName, lag, sensibility, loop)
+  df3 <- strategy.stabilization(dd3,assetsName, lag, sensibility, loop)
+  df4 <- strategy.stabilization(dd4,assetsName, lag, sensibility, loop)
+  df5 <- strategy.stabilization(dd5,assetsName, lag, sensibility, loop)
+  
+  s1 <- as.vector(df1$StableStrat)
+  s2 <- as.vector(df2$StableStrat)
+  s3 <- as.vector(df3$StableStrat)
+  s4 <- as.vector(df4$StableStrat)
+  s5 <- as.vector(df5$StableStrat)
+  
+  maxlength <- length(s5)
 
-message("test chgt branche1")
-#symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
+  s1 <- c(s1, rep(NA,maxlength - length(s1)))
+  s2 <- c(s2, rep(NA,maxlength - length(s2)))
+  s3 <- c(s3, rep(NA,maxlength - length(s3)))
+  s4 <- c(s4, rep(NA,maxlength - length(s4)))
+  s5 <- c(s5, rep(NA,maxlength - length(s5)))
+  
+  return(data.frame('a1' = s1, 'a2' = s2, 'a3' = s3, 'a4' = s4, 'a5' = s5))
+  
+  
+  
+}
 
+#Fonction de base, genere le backtest et la strategie d'investisement a t+1
 bcp.investor <- function(DataSet,assetsName, lag, sensibility){
   
-  #asset<-getSymbols(assetsName,auto.assign = FALSE)
-  #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
-  message("test branche Niak2")
-  
-  #asset<-getSymbols(assetsName,auto.assign = FALSE)
-  
-  #wkreturn<-read.delim('C:\\Users\\ibrahim\\Documents\\Ibrahim\\Mes docs\\Bayesian\\ShinyDashboard18 02 17 - Copie\\ShinyDashboard\\STXX50+SBF120DataReuters10Y 31 01 2017_ Clean.txt', header=TRUE) 
-  
-  #wkreturn<- weeklyReturn(asset,auto.assign = FALSE)-0.004
-  
-  #wkreturn <- DataSet$assetsName
-  #assetsName<-'ACCOR'
   wkreturn <- DataSet[,assetsName] * 0.01
   wkreturn <- wkreturn[,assetsName]
- # wkreturn <-data.frame(return = wkreturn)
-#  row.names(wkreturn) <- DataSet$Date
-  
-  ts.asset <-timeSeries(wkreturn)
+
+  ts.asset <- timeSeries(wkreturn)
   
   # Noter les dates
   wkdate <- DataSet[,'Date']
-  wkdate <- wkdate$Date
-  # wkreturn <-data.frame(return = wkreturn)
-  #  row.names(wkreturn) <- DataSet$Date
+  wkdate <- as.character(wkdate$Date)
+
   
-  #date.asset <-timeSeries(wkdate)
-  
-  ###################
+
   bcp.asset <-bcp(ts.asset, burnin = 10000, mcmc = 10000) #Ajout MC number , mcmc= 5000
+
   
   #Proba decale de 1 (forecast)
   #prob = c(0, bcp.asset$posterior.prob[1:length(bcp.asset$posterior.prob)-1])
-  prob = c(NA,NA, bcp.asset$posterior.prob[1:length(bcp.asset$posterior.prob)-1])
+  prob = c(NA,NA, bcp.asset$posterior.prob[1:length(bcp.asset$posterior.prob) - 1])
   
   df <- data.frame( 
                     "posterior.mean.o" = c(bcp.asset$posterior.mean,NA),
@@ -68,20 +86,20 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
                     "prob" = prob
   )
 
-  rownames(df)<-c(index(wkreturn),"01")
+  rownames(df) <- c(index(wkreturn),"01")
   df$return <- c(wkreturn,NA)
   
   n <- length(df$prob)
   
   #Sharp decale de 1 (forecast)
-  sharp.temp <- ((df$posterior.mean)/(sqrt(df$posterior.var)))*(1/(df$prob+0.001))
+  sharp.temp <- ((df$posterior.mean)/(sqrt(df$posterior.var)))*(1/(df$prob + 0.001))
   df$sharp <- sharp.temp
   thresld <- rep(99999,n)
   
   
   
-  for(i in 1:n){
-    if(i<20){
+  for (i in 1:n){
+    if (i < 20){
       thresld[i] <- quantile( df$sharp[1:i], c(.1, .2, .3, .4, .5, .6, .7, .8, .9), na.rm = TRUE)[3]
     }
     else{
@@ -120,6 +138,49 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
 }
 
 
+#Fonction qui lance plusieurs fois bcp.investor
+#et fais la moyenne des decisions d'investissement
+#pour une bonne stabilisation pensée à mettre loop > 100
+strategy.stabilization <- function(DataSet,assetsName, lag, sensibility, loop){
+  
+  strat <- rep(0,nrow(DataSet))
+  for(i in seq(1,loop)){
+    message(i)
+    df_temp = bcp.investor(DataSet,assetsName, lag, sensibility)
+    strat <- strat + as.vector(df_temp$strat)
+  }
+  
+  strat <- strat/loop
+  
+  df_temp$StableStrat <- strat
+  message('End')
+  return(df_temp)
+}
+
+
+
+
+
+df.format <- function(DataSet, lag){
+  
+  #lag 1
+  lag1 <- c(NA,NA,NA, DataSet[4:(nrow(DataSet))-1,'sharp'])
+  DataSet$lag1 <- lag1
+  
+  lag2 <- c(NA,NA,NA,NA, DataSet[5:(nrow(DataSet))-2,'sharp'])
+  DataSet$lag2 <- lag2
+  
+  
+  lag3 <- c(NA,NA,NA,NA,NA, DataSet[6:(nrow(DataSet))-3,'sharp'])
+  DataSet$lag3 <- lag3
+  
+  DataSet$agressivity1 <- (DataSet$sharp - DataSet$lag1)/DataSet$lag1
+  DataSet$agressivity2 <- (DataSet$sharp - DataSet$lag2)/DataSet$lag2
+  DataSet$agressivity3 <- (DataSet$sharp - DataSet$lag3)/DataSet$lag3
+  
+  return(DataSet)
+}
+
 
 
 error.investment <- function(df.bcp){
@@ -131,7 +192,7 @@ error.investment <- function(df.bcp){
 
 
 
-agressivity.investmen <- function(df.bcp){
+agressivity.investment <- function(df.bcp){
   n<-length(df.bcp$strat)
   indicator <- TRUE
   i <- 0
@@ -160,19 +221,15 @@ agressivity.investmen <- function(df.bcp){
     perf <- (df.bcp$wealth[n-1] - df.bcp$wealth[index+1])/df.bcp$wealth[index+1]
     #print(df.bcp$wealth[n])
     #print(n)
-    print(df.bcp$wealth[(index+1):n])
-    print(df.bcp$return[(index+1):n])
-    print('')
+    #print(df.bcp$wealth[(index+1):n])
+    #print(df.bcp$return[(index+1):n])
+    #print('')
     
     #Relever la date de changement de position
     
     aggressivity.dur <- df.bcp$date[index]
     perf <- (df.bcp$wealth[n-1] - df.bcp$wealth[index+1])/df.bcp$wealth[index+1]
-    #print(df.bcp$wealth[n])
-    #print(n)
-    print(df.bcp$wealth[(index+1):n])
-    print(df.bcp$return[(index+1):n])
-    print('')
+
     
     return(list(aggressivity.coef, n - index,round(perf,4)*100,aggressivity.dur))
   }
