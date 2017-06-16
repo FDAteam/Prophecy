@@ -15,18 +15,22 @@ DataSet <- read_excel("data/data.xlsx")
 symbols<- data.frame(Symbol = colnames(DataSet[,2:ncol(DataSet)]))
 
 #Asset dataframe
-
 df <- bcp.investor(DataSet, 'AXA',20,0.01)
 
 
+
+strategy <- bcp.backtest(DataSet, 'AXA',20,0.01, df)
+#write.xlsx(strategy, "C:/Users/bgharbi/Desktop/PROPHECY_2.xlsx")
+#View(data.frame(strategy))
 #Nouveau - va stabiliser la stratégie (colonne StableStrat - derniere colonne)
 df <- strategy.stabilization(DataSet, 'AXA',20,0.01, 10)
+
 
 #Formatage pour logit si necessaire
 df <- df.format(df,20)
 
 #test de robustesse
-tt <- robust.check(DataSet, 'AXA',20,0.01, 200)
+tt <- robust.check(DataSet, 'AXA',20,0.01, 100)
 
 
 #Calcul de l'erreur (standard deviation)

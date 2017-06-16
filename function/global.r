@@ -68,7 +68,7 @@ bcp.investor <- function(DataSet,assetsName, lag, sensibility){
 
   
 
-  bcp.asset <-bcp(ts.asset, burnin = 10000, mcmc = 10000) #Ajout MC number , mcmc= 5000
+  bcp.asset <-bcp(ts.asset, burnin = 5000, mcmc = 5000) #Ajout MC number , mcmc= 5000
 
   
   #Proba decale de 1 (forecast)
@@ -156,6 +156,122 @@ strategy.stabilization <- function(DataSet,assetsName, lag, sensibility, loop){
   message('End')
   return(df_temp)
 }
+
+
+
+
+#mav <- function(x,n=5){filter(x,rep(1/n,n), sides=2)}
+
+
+bcp.backtest <- function(datas,assetsName, lag, sensibility, dataframebcp){
+  
+  row <- nrow(datas)
+  n<-nrow(datas)-1
+  #n<-160
+  strategy<- c()
+  date <- c()
+  
+  dataframebcp.temp <- dataframebcp[1:(n+1),]
+  dataframebcp.temp$stratBack <- rep(0,(n+1))
+  dataframebcp.temp$wealthBack <- rep(100,(n+1))
+  dataframebcp.temp$probback <- rep(-1,(n+1))
+  dataframebcp.temp$sdback <- rep(-1,(n+1))
+  dataframebcp.temp$meanback <- rep(-1,(n+1))
+  
+  for(i in 4:n){
+  print(i)
+  dd1<-datas[1:i,]
+  ##print(dd1)
+  
+  dftemp <- bcp.investor(dd1,assetsName, lag, sensibility)
+  m <- nrow(dftemp)
+  o <- m-20
+  
+  if(m<20){
+    pmean<-mean(dftemp$posterior.mean[1:m])
+    psd<-mean(dftemp$posterior.var[1:m])
+    pprob<-mean(dftemp$prob[1:m])
+  }else{
+    pmean<-mean(dftemp$posterior.mean[o:m])
+    psd<-mean(dftemp$posterior.var[o:m])
+    pprob<-mean(dftemp$prob[o:m])
+  }
+  
+  
+  
+  
+  lstrow <- nrow(dftemp)
+  
+  message(lstrow)
+  if(!is.na(dftemp[lstrow,'strat'])){
+    dataframebcp.temp[i+1, 'stratBack'] <- dftemp[lstrow,'strat']
+  }
+  
+  dataframebcp.temp[i+1, 'probback'] <- pprob
+  dataframebcp.temp[i+1, 'meanback'] <- pmean
+  dataframebcp.temp[i+1, 'sdback'] <- psd
+  dataframebcp.temp[i+1, 'wealthBack'] <- dataframebcp.temp[i,'wealthBack'] + (dataframebcp.temp[i+1,'return'] -  dataframebcp.temp[i+1,'return']*(1-dataframebcp.temp[i+1,'stratBack'])  )* dataframebcp.temp[i,'wealthBack']
+  #if(i == 4){
+  #  dftemp3 <- dftemp[lstrow,]
+  #}else{
+  #  dftemp3 <- rbind(dftemp3,dftemp[lstrow,])
+  #}
+  
+  #date <- c(date, dftemp[lstrow-1,'strat'])
+  }
+  
+  
+  sharp.temp <- ((dataframebcp.temp$meanback)/(sqrt(dataframebcp.temp$sdback)))*(1/(dataframebcp.temp$probback + 0.001))
+  dataframebcp.temp$sharpback <- sharp.temp
+  thresld <- rep(99999,n+1)
+  
+  
+  
+  
+  for (i in 1:(n+1)){
+    if (i < 20){
+      thresld[i] <- quantile( dataframebcp.temp$sharpback[1:i], c(.1, .2, .3, .4, .5, .6, .7, .8, .9), na.rm = TRUE)[3]
+    }
+    else{
+      thresld[i] <- quantile( dataframebcp.temp$sharpback[(i-(20-1)):i], c(.1, .2, .3, .4, .5, .6, .7, .8, .9), na.rm = TRUE)[3]
+    }
+    
+  }
+  
+  
+  dataframebcp.temp$thresldback <- thresld
+  
+  dataframebcp.temp$stratbacknew <- ifelse(dataframebcp.temp$sharpback - dataframebcp.temp$thresldback >= 0.05*dataframebcp.temp$thresldback & dataframebcp.temp$sharpback>0, 1,0)
+  
+  
+  
+  wealth2 <- rep(100,(n+1))  
+  
+  for(i in 4:(n+1)){
+    
+    #wealth[i] <- (1+df$return[i])*wealth[i-1]
+    #print(wealth2[i-1] + (df$return[i] -  df$return[i]*(1 - df$strat[i])  )*wealth2[i-1])
+    
+    if(is.na(wealth2[i-1])){
+      wealth2[i-1] <- 100
+    }
+    wealth2[i] <- wealth2[i-1] + (dataframebcp.temp$return[i] -  dataframebcp.temp$return[i]*(1-dataframebcp.temp$stratbacknew[i])  )*wealth2[i-1]
+    
+  }
+  
+  #df$wealth <- wealth
+  dataframebcp.temp$wealth.stratbacknew <- wealth2
+  
+  
+  
+  return(dataframebcp.temp)
+  
+}
+
+
+
+
+
 
 
 
